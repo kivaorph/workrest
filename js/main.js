@@ -92,13 +92,6 @@ function updateContent() {
     if (footerSlogan) footerSlogan.textContent = lang.footerSlogan;
 }
 
-// 切换语言
-document.getElementById('languageToggle').addEventListener('click', () => {
-    currentLang = currentLang === 'zh' ? 'en' : 'zh';
-    document.documentElement.lang = currentLang;
-    updateContent();
-});
-
 // 格式化时间
 function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60);
@@ -243,12 +236,16 @@ function completeTask() {
 }
 
 // 选择任务
-function selectTask(task) {
+function selectTask(task, event) {
     selectedTask = task;
     document.querySelectorAll('.task-btn').forEach(btn => {
         btn.classList.remove('border-primary-500');
     });
-    event.currentTarget.classList.add('border-primary-500');
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('border-primary-500');
+    } else if (this) {
+        this.classList.add('border-primary-500');
+    }
 }
 
 // 添加自定义任务
@@ -287,13 +284,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('stopTimer').addEventListener('click', stopTimer);
     document.getElementById('addCustomTask').addEventListener('click', addCustomTask);
     document.getElementById('completeTask').addEventListener('click', completeTask);
-    document.getElementById('languageToggle').addEventListener('click', () => {
-        currentLang = currentLang === 'zh' ? 'en' : 'zh';
-        document.documentElement.lang = currentLang;
-        updateContent();
-    });
+    // 为所有任务按钮绑定点击事件
     document.querySelectorAll('.task-btn').forEach(btn => {
-        btn.addEventListener('click', () => selectTask(btn.querySelector('span').textContent));
+        btn.addEventListener('click', function(event) {
+            selectTask.call(this, this.querySelector('span').textContent, event);
+        });
     });
 
     // 请求通知权限
