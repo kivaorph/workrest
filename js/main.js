@@ -185,6 +185,8 @@ async function showReminder() {
 
 // 开始计时器
 async function startTimer() {
+    clearInterval(timer); // 防止多次启动
+    isPaused = false;     // 每次开始都重置暂停状态
     const intervalInput = document.getElementById('intervalInput');
     const minutes = parseInt(intervalInput.value);
     
