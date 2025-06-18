@@ -136,9 +136,16 @@ async function requestNotificationPermission() {
 
 // 显示系统通知
 async function showSystemNotification(task) {
+    console.log('showSystemNotification 被调用，任务:', task);
+    console.log('通知权限:', Notification.permission);
+    
     if (Notification.permission === 'granted') {
         try {
+            console.log('准备获取 Service Worker 注册');
             const registration = await navigator.serviceWorker.ready;
+            console.log('Service Worker 已就绪:', registration);
+            
+            console.log('准备显示通知');
             await registration.showNotification('健康提醒', {
                 body: task,
                 icon: 'https://cdn-icons-png.flaticon.com/512/2965/2965879.png',
@@ -154,17 +161,23 @@ async function showSystemNotification(task) {
                 vibrate: [200, 100, 200], // 添加震动效果
                 silent: false // 确保声音可以播放
             });
+            console.log('系统通知显示成功');
         } catch (error) {
             console.error('显示通知失败:', error);
         }
+    } else {
+        console.log('通知权限未授予，无法显示系统通知');
     }
 }
 
 // 显示提醒
 async function showReminder() {
+    console.log('showReminder 被调用');
     const task = selectedTask || translations[currentLang].tasks.water;
+    console.log('任务内容:', task);
     
     // 显示系统通知
+    console.log('准备显示系统通知，权限状态:', Notification.permission);
     await showSystemNotification(task);
     
     // 同时显示网页内的提醒
@@ -173,11 +186,13 @@ async function showReminder() {
     taskMessage.textContent = task;
     modal.classList.remove('hidden');
     isPaused = true;
+    console.log('网页弹窗已显示，isPaused:', isPaused);
     
     // 播放提示音
     try {
         const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3');
         await audio.play();
+        console.log('提示音播放成功');
     } catch (error) {
         console.error('播放提示音失败:', error);
     }
@@ -220,8 +235,6 @@ async function startTimer() {
             if (timeRemaining <= 0) {
                 console.log('计时结束，弹出提醒');
                 showReminder();
-                timeRemaining = minutes * 60;
-                updateTimerDisplay();
             }
         }
     }, 1000);
@@ -241,6 +254,13 @@ function stopTimer() {
 function completeTask() {
     const modal = document.getElementById('reminderModal');
     modal.classList.add('hidden');
+    
+    // 重置计时器时间并开始下一轮
+    const intervalInput = document.getElementById('intervalInput');
+    const minutes = parseInt(intervalInput.value);
+    timeRemaining = minutes * 60;
+    updateTimerDisplay();
+    
     isPaused = false;
 }
 
