@@ -185,40 +185,47 @@ async function showReminder() {
 
 // 开始计时器
 async function startTimer() {
+    console.log('startTimer 被调用');
     clearInterval(timer); // 防止多次启动
     isPaused = false;     // 每次开始都重置暂停状态
     const intervalInput = document.getElementById('intervalInput');
     const minutes = parseInt(intervalInput.value);
+    console.log('输入的分钟数:', minutes);
     
     if (isNaN(minutes) || minutes < 1 || minutes > 120) {
         alert('请输入1-120之间的分钟数');
         return;
     }
 
-    // 检查通知权限
+    // 恢复通知权限判断和请求
     if (Notification.permission !== 'granted') {
         const hasPermission = await requestNotificationPermission();
         if (!hasPermission) return;
     }
 
     timeRemaining = minutes * 60;
+    console.log('timeRemaining 初始化:', timeRemaining);
     updateTimerDisplay();
     
     document.getElementById('startTimer').classList.add('hidden');
     document.getElementById('stopTimer').classList.remove('hidden');
     
+    console.log('准备启动定时器');
     timer = setInterval(() => {
+        console.log('倒计时:', timeRemaining, 'isPaused:', isPaused);
         if (!isPaused) {
             timeRemaining--;
             updateTimerDisplay();
             
             if (timeRemaining <= 0) {
+                console.log('计时结束，弹出提醒');
                 showReminder();
                 timeRemaining = minutes * 60;
                 updateTimerDisplay();
             }
         }
     }, 1000);
+    console.log('定时器已启动');
 }
 
 // 停止计时器
