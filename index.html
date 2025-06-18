@@ -48,8 +48,8 @@
 </head>
 <body class="min-h-screen bg-neutral-50 dark:bg-neutral-900">
     <header class="bg-white dark:bg-neutral-800 shadow-soft">
-        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div id="mainTitle" class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+        <nav class="container mx-auto px-4 py-4 flex flex-col items-center justify-center">
+            <div id="mainTitle" class="text-2xl font-bold text-primary-600 dark:text-primary-400 flex items-center justify-center">
                 <i class="fas fa-heartbeat mr-2"></i>健康提醒助手
             </div>
         </nav>
@@ -132,7 +132,8 @@
     <footer class="bg-neutral-800 text-neutral-200 py-8 mt-12">
         <div class="container mx-auto px-4">
             <div class="max-w-3xl mx-auto text-center">
-                <p id="footerSlogan" class="mb-4">保持健康，从定时提醒开始</p>
+                <p class="mb-4 text-base text-neutral-400">使用说明：1. 输入提醒的时间间隔（1-120分钟），点击"开始"按钮；2. 选择或自定义健康任务；3. 到点后会自动弹窗和系统通知提醒你活动；4. 点击"已完成"关闭提醒，计时器会自动重启。</p>
+                <p class="mb-4">保持健康，从定时提醒开始</p>
                 <div class="flex justify-center space-x-4">
                     <a href="#" class="hover:text-primary-400 transition-colors">
                         <i class="fab fa-github text-xl"></i>
