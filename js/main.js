@@ -163,7 +163,18 @@ async function showSystemNotification(task) {
             });
             console.log('系统通知显示成功');
         } catch (error) {
-            console.error('显示通知失败:', error);
+            console.error('Service Worker 通知失败，尝试使用普通通知:', error);
+            // 如果Service Worker通知失败，使用普通通知
+            try {
+                new Notification('健康提醒', {
+                    body: task,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/2965/2965879.png',
+                    requireInteraction: true
+                });
+                console.log('普通通知显示成功');
+            } catch (fallbackError) {
+                console.error('普通通知也失败:', fallbackError);
+            }
         }
     } else {
         console.log('通知权限未授予，无法显示系统通知');
@@ -212,10 +223,12 @@ async function startTimer() {
         return;
     }
 
-    // 恢复通知权限判断和请求
+    // 请求通知权限，但不阻止计时器启动
+    console.log('当前通知权限:', Notification.permission);
     if (Notification.permission !== 'granted') {
+        console.log('尝试请求通知权限');
         const hasPermission = await requestNotificationPermission();
-        if (!hasPermission) return;
+        console.log('通知权限请求结果:', hasPermission);
     }
 
     timeRemaining = minutes * 60;
