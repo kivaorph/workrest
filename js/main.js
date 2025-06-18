@@ -242,10 +242,11 @@ async function startTimer() {
     timer = setInterval(() => {
         console.log('倒计时:', timeRemaining, 'isPaused:', isPaused);
         if (!isPaused) {
-            timeRemaining--;
-            updateTimerDisplay();
-            
-            if (timeRemaining <= 0) {
+            if (timeRemaining > 0) {
+                timeRemaining--;
+                updateTimerDisplay();
+            }
+            if (timeRemaining === 0) {
                 console.log('计时结束，弹出提醒');
                 showReminder();
             }
@@ -333,6 +334,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 请求通知权限
-    await requestNotificationPermission();
+    // 主动请求通知权限
+    if ("Notification" in window) {
+        if (Notification.permission === 'default') {
+            await requestNotificationPermission();
+        }
+    }
 }); 
