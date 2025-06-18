@@ -110,8 +110,8 @@ function updateTimerDisplay() {
 // 注册Service Worker
 async function registerServiceWorker() {
     try {
-        // 注册时加上scope参数，确保只控制当前目录
-        const registration = await navigator.serviceWorker.register('sw.js', { scope: './' });
+        // 注册时使用相对路径，适配GitHub Pages子目录
+        const registration = await navigator.serviceWorker.register('./sw.js', { scope: './' });
         console.log('Service Worker 注册成功:', registration);
         return registration;
     } catch (error) {
