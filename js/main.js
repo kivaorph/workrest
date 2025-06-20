@@ -270,8 +270,11 @@ function completeTask() {
     console.log('--- completeTask: 开始执行 ---');
     const modal = document.getElementById('reminderModal');
     modal.classList.add('hidden');
-    stopTimer(); // 任务完成后，调用stopTimer来重置界面状态
-    console.log('--- completeTask: 已调用 stopTimer ---');
+    
+    // 任务完成后，直接调用 startTimer() 来自动开始下一轮
+    startTimer(); 
+    
+    console.log('--- completeTask: 已调用 startTimer 开始新一轮计时 ---');
 }
 
 // 选择任务
