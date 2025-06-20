@@ -211,70 +211,54 @@ async function showReminder() {
 
 // 开始计时器
 async function startTimer() {
-    console.log('--- startTimer: 开始执行 ---');
     clearInterval(timer);
     const intervalInput = document.getElementById('intervalInput');
     const minutes = parseInt(intervalInput.value);
     
     if (isNaN(minutes) || minutes < 1 || minutes > 120) {
         alert('请输入1-120之间的分钟数');
-        console.log('--- startTimer: 结束，因为分钟数无效 ---');
         return;
     }
-    console.log(`--- startTimer: 用户设置分钟: ${minutes} ---`);
 
     if (Notification.permission !== 'granted') {
         await requestNotificationPermission();
     }
 
     endTime = Date.now() + minutes * 60 * 1000;
-    console.log(`--- startTimer: 计算出的结束时间戳: ${endTime} ---`);
     
     document.getElementById('startTimer').classList.add('hidden');
     document.getElementById('stopTimer').classList.remove('hidden');
     
     timerTick();
     timer = setInterval(timerTick, 1000);
-    console.log('--- startTimer: 定时器已启动 ---');
 }
 
 // 计时器核心逻辑
 function timerTick() {
     const remainingMilliseconds = endTime - Date.now();
     timeRemaining = Math.max(0, Math.round(remainingMilliseconds / 1000));
-    
-    console.log(`--- timerTick: 剩余时间: ${timeRemaining} 秒 ---`);
     updateTimerDisplay();
     
     if (remainingMilliseconds <= 0) {
-        console.log('--- timerTick: 计时结束，准备弹出提醒 ---');
         showReminder();
         clearInterval(timer);
-        console.log('--- timerTick: 旧的计时器已清除 ---');
     }
 }
 
 // 停止计时器
 function stopTimer() {
-    console.log('--- stopTimer: 开始执行 ---');
     clearInterval(timer);
     timer = null;
     document.getElementById('startTimer').classList.remove('hidden');
     document.getElementById('stopTimer').classList.add('hidden');
     document.getElementById('timerDisplay').classList.add('hidden');
-    console.log('--- stopTimer: 界面已重置 ---');
 }
 
 // 完成任务
 function completeTask() {
-    console.log('--- completeTask: 开始执行 ---');
     const modal = document.getElementById('reminderModal');
     modal.classList.add('hidden');
-    
-    // 任务完成后，直接调用 startTimer() 来自动开始下一轮
-    startTimer(); 
-    
-    console.log('--- completeTask: 已调用 startTimer 开始新一轮计时 ---');
+    startTimer();
 }
 
 // 选择任务
