@@ -211,37 +211,31 @@ async function showReminder() {
 
 // 开始计时器
 async function startTimer() {
-    console.log('startTimer 被调用');
-    clearInterval(timer); // 防止多次启动
+    console.log('--- startTimer: 开始执行 ---');
+    clearInterval(timer);
     const intervalInput = document.getElementById('intervalInput');
     const minutes = parseInt(intervalInput.value);
-    console.log('输入的分钟数:', minutes);
     
     if (isNaN(minutes) || minutes < 1 || minutes > 120) {
         alert('请输入1-120之间的分钟数');
+        console.log('--- startTimer: 结束，因为分钟数无效 ---');
         return;
     }
+    console.log(`--- startTimer: 用户设置分钟: ${minutes} ---`);
 
-    // 请求通知权限，但不阻止计时器启动
-    console.log('当前通知权限:', Notification.permission);
     if (Notification.permission !== 'granted') {
-        console.log('尝试请求通知权限');
-        const hasPermission = await requestNotificationPermission();
-        console.log('通知权限请求结果:', hasPermission);
+        await requestNotificationPermission();
     }
 
-    // 设置结束时间
     endTime = Date.now() + minutes * 60 * 1000;
+    console.log(`--- startTimer: 计算出的结束时间戳: ${endTime} ---`);
     
     document.getElementById('startTimer').classList.add('hidden');
     document.getElementById('stopTimer').classList.remove('hidden');
     
-    // 立即执行一次，避免延迟1秒才显示
     timerTick();
-
-    console.log('准备启动定时器');
     timer = setInterval(timerTick, 1000);
-    console.log('定时器已启动');
+    console.log('--- startTimer: 定时器已启动 ---');
 }
 
 // 计时器核心逻辑
@@ -249,33 +243,35 @@ function timerTick() {
     const remainingMilliseconds = endTime - Date.now();
     timeRemaining = Math.max(0, Math.round(remainingMilliseconds / 1000));
     
+    console.log(`--- timerTick: 剩余时间: ${timeRemaining} 秒 ---`);
     updateTimerDisplay();
     
-    console.log('倒计时:', timeRemaining);
-
     if (remainingMilliseconds <= 0) {
-        console.log('计时结束，弹出提醒');
+        console.log('--- timerTick: 计时结束，准备弹出提醒 ---');
         showReminder();
-        clearInterval(timer); // 计时结束，停止计时器
+        clearInterval(timer);
+        console.log('--- timerTick: 旧的计时器已清除 ---');
     }
 }
 
 // 停止计时器
 function stopTimer() {
+    console.log('--- stopTimer: 开始执行 ---');
     clearInterval(timer);
     timer = null;
     document.getElementById('startTimer').classList.remove('hidden');
     document.getElementById('stopTimer').classList.add('hidden');
     document.getElementById('timerDisplay').classList.add('hidden');
+    console.log('--- stopTimer: 界面已重置 ---');
 }
 
 // 完成任务
 function completeTask() {
+    console.log('--- completeTask: 开始执行 ---');
     const modal = document.getElementById('reminderModal');
     modal.classList.add('hidden');
-    
-    // 直接调用startTimer开始新的一个周期
-    startTimer();
+    stopTimer(); // 任务完成后，调用stopTimer来重置界面状态
+    console.log('--- completeTask: 已调用 stopTimer ---');
 }
 
 // 选择任务
