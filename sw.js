@@ -8,9 +8,15 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
-    
+
+    const urlToOpen = new URL(self.location.origin).href;
+
     event.waitUntil(
-        clients.matchAll({ type: 'window' }).then((clientList) => {
+        clients.matchAll({
+            type: 'window',
+            includeUncontrolled: true,
+        }).then((clientList) => {
+            // 如果已经有一个窗口打开，则聚焦它
             if (clientList.length > 0) {
                 let client = clientList[0];
                 for (let i = 0; i < clientList.length; i++) {
@@ -18,9 +24,13 @@ self.addEventListener('notificationclick', (event) => {
                         client = clientList[i];
                     }
                 }
-                return client.focus();
+                if (client) {
+                    return client.focus();
+                }
             }
-            return clients.openWindow('./');
+
+            // 否则，打开一个新窗口
+            return clients.openWindow(urlToOpen);
         })
     );
 }); 
