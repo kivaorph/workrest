@@ -49,9 +49,9 @@ let currentLang = 'zh';
 
 // 计时器相关变量
 let timer = null;
+let endTime = 0; // 新增：用于存储计时器的结束时间
 let timeRemaining = 0;
 let selectedTask = '';
-let isPaused = false;
 
 // 更新页面内容
 function updateContent() {
@@ -197,8 +197,7 @@ async function showReminder() {
     const taskMessage = document.getElementById('taskMessage');
     taskMessage.textContent = task;
     modal.classList.remove('hidden');
-    isPaused = true;
-    console.log('网页弹窗已显示，isPaused:', isPaused);
+    console.log('网页弹窗已显示');
     
     // 播放提示音
     try {
@@ -214,7 +213,6 @@ async function showReminder() {
 async function startTimer() {
     console.log('startTimer 被调用');
     clearInterval(timer); // 防止多次启动
-    isPaused = false;     // 每次开始都重置暂停状态
     const intervalInput = document.getElementById('intervalInput');
     const minutes = parseInt(intervalInput.value);
     console.log('输入的分钟数:', minutes);
@@ -232,28 +230,34 @@ async function startTimer() {
         console.log('通知权限请求结果:', hasPermission);
     }
 
-    timeRemaining = minutes * 60;
-    console.log('timeRemaining 初始化:', timeRemaining);
-    updateTimerDisplay();
+    // 设置结束时间
+    endTime = Date.now() + minutes * 60 * 1000;
     
     document.getElementById('startTimer').classList.add('hidden');
     document.getElementById('stopTimer').classList.remove('hidden');
     
+    // 立即执行一次，避免延迟1秒才显示
+    timerTick();
+
     console.log('准备启动定时器');
-    timer = setInterval(() => {
-        console.log('倒计时:', timeRemaining, 'isPaused:', isPaused);
-        if (!isPaused) {
-            if (timeRemaining > 0) {
-                timeRemaining--;
-                updateTimerDisplay();
-            }
-            if (timeRemaining === 0) {
-                console.log('计时结束，弹出提醒');
-                showReminder();
-            }
-        }
-    }, 1000);
+    timer = setInterval(timerTick, 1000);
     console.log('定时器已启动');
+}
+
+// 计时器核心逻辑
+function timerTick() {
+    const remainingMilliseconds = endTime - Date.now();
+    timeRemaining = Math.max(0, Math.round(remainingMilliseconds / 1000));
+    
+    updateTimerDisplay();
+    
+    console.log('倒计时:', timeRemaining);
+
+    if (remainingMilliseconds <= 0) {
+        console.log('计时结束，弹出提醒');
+        showReminder();
+        clearInterval(timer); // 计时结束，停止计时器
+    }
 }
 
 // 停止计时器
@@ -270,13 +274,8 @@ function completeTask() {
     const modal = document.getElementById('reminderModal');
     modal.classList.add('hidden');
     
-    // 重置计时器时间并开始下一轮
-    const intervalInput = document.getElementById('intervalInput');
-    const minutes = parseInt(intervalInput.value);
-    timeRemaining = minutes * 60;
-    updateTimerDisplay();
-    
-    isPaused = false;
+    // 直接调用startTimer开始新的一个周期
+    startTimer();
 }
 
 // 选择任务
