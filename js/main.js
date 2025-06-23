@@ -49,7 +49,7 @@ const translations = {
 };
 
 // 当前语言，优先读取本地存储
-let currentLang = localStorage.getItem('lang') || 'zh';
+let currentLang = localStorage.getItem('lang') || 'en';
 
 // 更新所有带 data-translate 的文本
 function updateContent() {
