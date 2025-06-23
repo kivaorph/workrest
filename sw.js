@@ -9,7 +9,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
 
-    const urlToOpen = new URL(self.location.origin).href;
+    const urlToOpen = self.registration.scope;
 
     event.waitUntil(
         clients.matchAll({
